@@ -1,0 +1,31 @@
+---
+import { INSTAGRAM_HREF, TIKTOK_HREF, WHATSAPP_HREF } from '../lib/site';
+
+interface Props {
+  primaryHref?: string;
+  primaryLabel?: string;
+}
+
+const { primaryHref = '/blog', primaryLabel = 'Blog' } = Astro.props;
+---
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <div class="footer-logos">
+        <img src="/assets/logo-democrata.jpeg" alt="Democrata 35" width="1290" height="967" />
+      </div>
+      <div>
+        <strong>Wilson Campos</strong>
+        <p>Candidato a Deputado Estadual · Democrata 35</p>
+      </div>
+    </div>
+    <div class="footer-links">
+      <a href={primaryHref}>{primaryLabel}</a>
+      <a data-whatsapp href={WHATSAPP_HREF} target="_blank" rel="noreferrer">WhatsApp</a>
+      <a href={INSTAGRAM_HREF} target="_blank" rel="noreferrer">Instagram</a>
+      <a href={TIKTOK_HREF} target="_blank" rel="noreferrer">TikTok</a>
+      <span>Itabira · Minas Gerais</span>
+    </div>
+  </div>
+</footer>

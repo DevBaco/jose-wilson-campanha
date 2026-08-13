@@ -1,0 +1,14 @@
+---
+import BlogArchivePage from '../../components/BlogArchivePage.astro';
+import { getCollection } from 'astro:content';
+import { BLOG_PAGE_SIZE } from '../../lib/blog';
+
+const allPosts = (await getCollection('noticias', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+const posts = allPosts.slice(0, BLOG_PAGE_SIZE);
+const totalPages = Math.max(1, Math.ceil(allPosts.length / BLOG_PAGE_SIZE));
+---
+
+<BlogArchivePage posts={posts} allPosts={allPosts} currentPage={1} totalPages={totalPages} />

@@ -1,0 +1,22 @@
+# Dependências
+node_modules/
+.pnpm-store/
+
+# Build do Astro
+dist/
+.astro/
+
+# Ambiente / logs
+.env
+.env.*
+!.env.example
+*.log
+npm-debug.log*
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Artefatos de automação/testes (Playwright CLI)
+.playwright-cli/
+tmp/

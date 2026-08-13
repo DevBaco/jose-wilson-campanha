@@ -1,0 +1,404 @@
+---
+import Layout from '../layouts/Layout.astro';
+import BlogCard from '../components/BlogCard.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import WhatsAppFloat from '../components/WhatsAppFloat.astro';
+import { getCollection } from 'astro:content';
+import { EMAIL, INSTAGRAM_HREF, PHONE_DISPLAY, SITE_URL, TIKTOK_HREF, WHATSAPP_HREF, absoluteUrl } from '../lib/site';
+
+const whatsappHref = WHATSAPP_HREF;
+const siteUrl = Astro.site ?? new URL(SITE_URL);
+const homeUrl = absoluteUrl('/', siteUrl);
+const websiteId = `${homeUrl}#website`;
+const personId = `${homeUrl}#wilson-campos`;
+const candidateImage = absoluteUrl('/assets/wilson-campos-retrato.png', siteUrl);
+
+const homeStructuredData = [
+  {
+    '@type': 'WebSite',
+    '@id': websiteId,
+    url: homeUrl,
+    name: 'Wilson Campos',
+    description: 'Site de Wilson Campos, candidato a deputado estadual por Minas Gerais.',
+    inLanguage: 'pt-BR',
+    publisher: { '@id': personId },
+  },
+  {
+    '@type': 'Person',
+    '@id': personId,
+    name: 'Wilson Campos',
+    alternateName: 'José Wilson Campos',
+    url: homeUrl,
+    image: candidateImage,
+    description:
+      'Candidato a deputado estadual por Minas Gerais, defensor do desenvolvimento econômico, da educação e da geração de oportunidades em Itabira.',
+    jobTitle: 'Candidato a Deputado Estadual por Minas Gerais',
+    sameAs: [INSTAGRAM_HREF, TIKTOK_HREF],
+    mainEntityOfPage: { '@id': `${homeUrl}#webpage` },
+    homeLocation: {
+      '@type': 'Place',
+      name: 'Itabira, Minas Gerais, Brasil',
+    },
+    affiliation: {
+      '@type': 'Organization',
+      name: 'Democrata',
+    },
+    contactPoint: {
+      '@type': 'ContactPoint',
+      telephone: '+55-31-99963-7470',
+      email: EMAIL,
+      contactType: 'Atendimento da campanha',
+      availableLanguage: 'Portuguese',
+      areaServed: {
+        '@type': 'AdministrativeArea',
+        name: 'Minas Gerais',
+      },
+    },
+  },
+];
+
+const HOME_BLOG_LIMIT = 3;
+const posts = (await getCollection('noticias', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, HOME_BLOG_LIMIT);
+
+const timeline = [
+  {
+    label: '1981',
+    text: 'Chegou a Itabira para trabalhar com seu tio, Chiquinho. Foi ali que começou sua história com a cidade.',
+  },
+  {
+    label: 'Trabalho',
+    text: 'Construiu em Itabira sua trajetória profissional e tudo aquilo que conquistou ao longo da vida.',
+  },
+  {
+    label: 'Gratidão',
+    text: 'Dessa história nasceu uma relação profunda de gratidão — e a decisão de retribuir o que a cidade lhe proporcionou.',
+  },
+];
+
+const platform = [
+  {
+    title: 'Desenvolvimento econômico',
+    text: 'Um ambiente que estimule a atividade econômica, valorize quem empreende e crie novas oportunidades para a população.',
+  },
+  {
+    title: 'Educação que abre caminhos',
+    text: 'Educação conectada com a vida real e com o mercado de trabalho, preparando os jovens para as oportunidades da região.',
+  },
+  {
+    title: 'Empreendedorismo fortalecido',
+    text: 'Apoio a quem gera emprego: comércio local, pequenos negócios e empresários que acreditam no potencial de Itabira.',
+  },
+  {
+    title: 'Futuro para as próximas gerações',
+    text: 'Economia forte significa oportunidade para quem vem depois. É isso que move essa candidatura.',
+  },
+];
+
+const impactIcons: Record<string, string> = {
+  economia:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="m7 14 3.5-3.5 3 3L20 7"/><path d="M20 11V7h-4"/></svg>',
+  educacao:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5v-5"/><path d="M22 10v5"/></svg>',
+  trabalho:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><path d="M2 13h20"/></svg>',
+};
+
+const impactStats = [
+  { icon: 'economia', label: 'Desenvolvimento econômico como prioridade' },
+  { icon: 'educacao', label: 'Educação ligada ao trabalho' },
+  { icon: 'trabalho', label: 'Oportunidades para quem vive em Itabira' },
+];
+
+const regionalPlan = [
+  'Ambiente favorável a quem empreende e gera emprego em Itabira',
+  'Educação e qualificação conectadas com as vagas que a região oferece',
+  'Representação próxima, ouvindo as demandas locais e levando-as à Assembleia',
+];
+---
+
+<Layout
+  title="Wilson Campos | Candidato a Deputado Estadual por MG"
+  description="Conheça Wilson Campos, candidato a deputado estadual por Minas Gerais: gratidão por Itabira, desenvolvimento econômico, educação e geração de oportunidades."
+  mainEntityId={personId}
+  structuredData={homeStructuredData}
+>
+  <SiteHeader mode="home" />
+
+  <main id="inicio">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-bg" aria-hidden="true">
+        <img
+          src="/assets/wilson-campos-retrato.png"
+          alt=""
+          width="1290"
+          height="2796"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </div>
+
+      <div class="container hero-grid">
+        <div class="hero-copy reveal">
+          <span class="hero-tagline">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 21s-7.5-4.7-9.4-9A5.4 5.4 0 0 1 12 6.6a5.4 5.4 0 0 1 9.4 5.4C19.5 16.3 12 21 12 21Z" />
+            </svg>
+            Gratidão por Itabira. <b>Compromisso com o desenvolvimento.</b>
+          </span>
+
+          <h1 class="hero-head">
+            <span class="hero-name">Wilson</span>
+            <span class="hero-surname">CAMPOS</span>
+            <span class="hero-role">Candidato a Deputado Estadual · Democrata 35</span>
+          </h1>
+
+          <p class="hero-headline">Experiência que trabalha, <em>compromisso que transforma</em>.</p>
+          <p class="hero-sub">
+            Desenvolvimento econômico, educação e oportunidades para quem constrói Itabira todos os dias.
+          </p>
+
+          <div class="hero-actions">
+            <a class="btn hero-primary btn-whatsapp" data-whatsapp href={whatsappHref} target="_blank" rel="noreferrer">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.8 4.9-1.3A10 10 0 1 0 12 2Zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8s.7-2 .9-2.2c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5.2.5.7 1.8.8 1.9.1.1.1.3 0 .5-.3.5-.5.7-.7 1-.2.2-.4.5-.2.8.2.4.9 1.5 2 2.4 1.3 1.2 2.4 1.5 2.7 1.7.3.1.5.1.7-.1.2-.3.8-.9 1-1.2.2-.3.4-.2.7-.1.3.1 1.8.8 2.1 1 .3.1.5.2.6.3.1.2.1.7-.1 1.3Z" />
+              </svg>
+              Fale com o Wilson
+            </a>
+            <a class="hero-secondary" href="#bandeiras">Conheça as bandeiras <span aria-hidden="true">↓</span></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-rail" aria-hidden="true">
+        <div class="hero-rail-track">
+          <span>Gratidão por Itabira</span><i></i><span>Desenvolvimento econômico</span><i></i><span>Educação e economia</span><i></i>
+          <span>Gratidão por Itabira</span><i></i><span>Desenvolvimento econômico</span><i></i><span>Educação e economia</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- HISTÓRIA -->
+    <section id="historia" class="section story-section">
+      <div class="container story-grid">
+        <div class="story-collage story-collage-single reveal">
+          <figure class="story-photo story-photo-legacy">
+            <img
+              src="/assets/wilson-campos-retrato.png"
+              alt="Wilson Campos, candidato a deputado estadual por Minas Gerais"
+              width="1290"
+              height="2796"
+              loading="lazy"
+            />
+          </figure>
+          <span class="story-stamp">Tudo que<br />consegui foi<br />em Itabira.</span>
+        </div>
+
+        <div class="story-copy reveal">
+          <p class="eyebrow">História de vida</p>
+          <h2 class="title">De 1981 até hoje: uma vida construída em Itabira.</h2>
+          <p class="story-intro">
+            A história de Wilson Campos com Itabira não começou agora. Desde 1981, a cidade faz parte de sua trajetória
+            pessoal e profissional — e é dessa história que nasce sua candidatura.
+          </p>
+          <div class="timeline">
+            {
+              timeline.map((item) => (
+                <article>
+                  <span>{item.label}</span>
+                  <p>{item.text}</p>
+                </article>
+              ))
+            }
+          </div>
+          <div class="section-actions">
+            <a class="btn btn-outline" href="#bandeiras">Conheça as propostas</a>
+            <a class="btn btn-whatsapp" data-whatsapp href={whatsappHref} target="_blank" rel="noreferrer">Fale com o Wilson</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BLOG -->
+    <section id="blog" class="section section-dark">
+      <div class="container">
+        <div class="section-head reveal blog-head">
+          <p class="blog-kicker"><span aria-hidden="true"></span>Blog do Wilson</p>
+          <div class="blog-head-row">
+            <h2 class="title">Notícias, propostas e a caminhada por Itabira.</h2>
+            <a class="btn btn-outline blog-head-cta" href="/blog">Ver todas as postagens</a>
+          </div>
+        </div>
+
+        {
+          posts.length === 0 ? (
+            <p class="lead">Em breve, novos conteúdos por aqui.</p>
+          ) : (
+            <div class="blog-list reveal">
+              {posts.map((post) => <BlogCard post={post} headingLevel="h3" />)}
+            </div>
+          )
+        }
+      </div>
+    </section>
+
+    <!-- CITAÇÃO -->
+    <section class="section band-quote">
+      <div class="container reveal">
+        <blockquote>
+          Tudo que consegui foi em Itabira, por isso tenho uma gratidão imensa. Tudo que eu fizer pela cidade será pouco
+          por tudo que ela já me proporcionou.
+        </blockquote>
+        <cite>Wilson Campos</cite>
+      </div>
+    </section>
+
+    <!-- ECONOMIA QUE GERA OPORTUNIDADE -->
+    <section class="section education-band">
+      <div class="container education-layout">
+        <div class="archive-collage archive-collage-single reveal">
+          <figure class="archive-photo archive-photo-one">
+            <img
+              src="/assets/wilson-campos-card-campanha.png"
+              alt="Peça de campanha de Wilson Campos, Democrata 35"
+              width="1240"
+              height="1240"
+              loading="lazy"
+            />
+          </figure>
+          <div class="archive-label"><b>Compromisso que transforma</b><span>Campanha · Democrata 35</span></div>
+        </div>
+
+        <div class="education-panel reveal">
+          <p class="eyebrow on-dark">Economia que gera oportunidade</p>
+          <h2 class="title">Quem empreende gera emprego — e emprego muda a vida de uma cidade.</h2>
+          <p class="lead">
+            O desenvolvimento econômico é a principal bandeira desta candidatura: valorizar quem empreende, fortalecer os
+            empresários e transformar isso em oportunidade para a população de Itabira.
+          </p>
+          <div class="impact-strip" aria-label="Resumo das prioridades">
+            {
+              impactStats.map((item) => (
+                <article>
+                  <span class="impact-ico" set:html={impactIcons[item.icon]} />
+                  <span>{item.label}</span>
+                </article>
+              ))
+            }
+          </div>
+          <div class="section-actions section-actions-on-dark">
+            <a class="btn btn-milho" href="#apoie">Apoie essa transformação</a>
+            <a class="btn btn-whatsapp" data-whatsapp href={whatsappHref} target="_blank" rel="noreferrer">Converse pelo WhatsApp</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BANDEIRAS -->
+    <section id="bandeiras" class="section">
+      <div class="container">
+        <div class="section-head reveal">
+          <p class="eyebrow">Bandeiras principais</p>
+          <h2 class="title">Quatro frentes para Itabira crescer com oportunidade.</h2>
+        </div>
+        <div class="regional-feature reveal">
+          <div class="regional-photos">
+            <figure class="regional-photo regional-photo-main">
+              <img
+                src="/assets/wilson-campos-retrato.png"
+                alt="Wilson Campos, candidato a deputado estadual"
+                width="1290"
+                height="2796"
+                loading="lazy"
+              />
+              <figcaption>Wilson Campos · Democrata 35</figcaption>
+            </figure>
+            <span class="regional-mark" aria-hidden="true">Itabira<br />Minas Gerais</span>
+          </div>
+          <div class="regional-copy">
+            <p class="eyebrow">Para quem é essa candidatura</p>
+            <h3>Empresários e cidadãos que acreditam no potencial de Itabira.</h3>
+            <ul>
+              {regionalPlan.map((item) => <li>{item}</li>)}
+            </ul>
+          </div>
+        </div>
+        <div class="platform">
+          {
+            platform.map((item, i) => (
+              <article class="platform-item reveal">
+                <div class="platform-num">{String(i + 1).padStart(2, '0')}</div>
+                <div class="platform-body">
+                  <h3>{item.title}</h3>
+                  <p>{item.text}</p>
+                </div>
+              </article>
+            ))
+          }
+        </div>
+        <aside class="midpage-cta reveal">
+          <div>
+            <p class="eyebrow">Participe</p>
+            <h3>Uma campanha construída ouvindo quem vive Itabira todos os dias.</h3>
+            <p>Envie sua ideia, conte o que seu bairro precisa e ajude a fortalecer nossas propostas.</p>
+          </div>
+          <div class="midpage-cta-actions">
+            <a class="btn btn-whatsapp" data-whatsapp href={whatsappHref} target="_blank" rel="noreferrer">Enviar ideia pelo WhatsApp</a>
+            <a class="btn btn-outline" href="#apoie">Quero participar</a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- APOIE -->
+    <section id="apoie" class="section section-dark">
+      <div class="container support-grid">
+        <div class="reveal">
+          <p class="eyebrow on-dark">Rede de apoio</p>
+          <h2 class="title">Some sua voz à nossa.</h2>
+          <p class="lead">
+            Entre na mobilização por uma voz forte para Itabira na Assembleia Legislativa de Minas Gerais.
+          </p>
+          <div class="support-contacts">
+            <a href="tel:+5531999637470">{PHONE_DISPLAY}</a>
+            <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
+            <a href={INSTAGRAM_HREF} target="_blank" rel="noreferrer">@wilsoncampos2026</a>
+            <a href={TIKTOK_HREF} target="_blank" rel="noreferrer">@campos3507</a>
+          </div>
+        </div>
+        <div class="support-cta reveal">
+          <span class="wa-circle wa-circle-lg">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.8 4.9-1.3A10 10 0 1 0 12 2Zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8s.7-2 .9-2.2c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5.2.5.7 1.8.8 1.9.1.1.1.3 0 .5-.3.5-.5.7-.7 1-.2.2-.4.5-.2.8.2.4.9 1.5 2 2.4 1.3 1.2 2.4 1.5 2.7 1.7.3.1.5.1.7-.1.2-.3.8-.9 1-1.2.2-.3.4-.2.7-.1.3.1 1.8.8 2.1 1 .3.1.5.2.6.3.1.2.1.7-.1 1.3Z" />
+            </svg>
+          </span>
+          <h3>Fale direto pelo WhatsApp</h3>
+          <p>Mande sua mensagem e some sua voz à nossa mobilização. É rápido e direto.</p>
+          <a class="btn btn-whatsapp" data-whatsapp href={whatsappHref} target="_blank" rel="noreferrer" style="width:100%">Falar no WhatsApp</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+  <WhatsAppFloat />
+
+  <script>
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate-in');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12 },
+    );
+    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+  </script>
+</Layout>

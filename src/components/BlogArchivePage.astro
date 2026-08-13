@@ -1,0 +1,307 @@
+---
+import Layout from '../layouts/Layout.astro';
+import BlogCard from './BlogCard.astro';
+import SiteFooter from './SiteFooter.astro';
+import SiteHeader from './SiteHeader.astro';
+import WhatsAppFloat from './WhatsAppFloat.astro';
+import type { CollectionEntry } from 'astro:content';
+import { BLOG_PAGE_SIZE } from '../lib/blog';
+import { SITE_URL, absoluteUrl } from '../lib/site';
+
+interface Props {
+  posts: CollectionEntry<'noticias'>[];
+  allPosts: CollectionEntry<'noticias'>[];
+  currentPage: number;
+  totalPages: number;
+}
+
+const { posts, allPosts, currentPage, totalPages } = Astro.props;
+
+const pageHref = (page: number) => (page === 1 ? '/blog' : `/blog/pagina/${page}`);
+const pageNumbers = Array.from({ length: totalPages }, (_, index) => index + 1);
+const firstVisiblePost = allPosts.length === 0 ? 0 : (currentPage - 1) * BLOG_PAGE_SIZE + 1;
+const lastVisiblePost = Math.min(currentPage * BLOG_PAGE_SIZE, allPosts.length);
+const initialStatus =
+  allPosts.length === 0
+    ? 'Nenhuma postagem publicada.'
+    : `Exibindo ${firstVisiblePost}–${lastVisiblePost} de ${allPosts.length} postagens.`;
+const pageTitle =
+  currentPage === 1
+    ? 'Blog do Wilson Campos | Educação e Economia em Itabira'
+    : `Blog do Wilson Campos — Página ${currentPage} | Itabira e Minas Gerais`;
+const pageDescription =
+  currentPage === 1
+    ? 'Notícias, ideias e propostas de Wilson Campos sobre desenvolvimento econômico, educação e oportunidades para Itabira e Minas Gerais.'
+    : `Página ${currentPage} do blog de Wilson Campos, com notícias, ideias e propostas para a economia e a educação de Itabira.`;
+const siteUrl = Astro.site ?? new URL(SITE_URL);
+const currentUrl = absoluteUrl(pageHref(currentPage), siteUrl);
+const itemListId = `${currentUrl}#postagens`;
+const blogStructuredData = {
+  '@type': 'ItemList',
+  '@id': itemListId,
+  name: currentPage === 1 ? 'Postagens do blog de Wilson Campos' : `Postagens do blog de Wilson Campos — página ${currentPage}`,
+  numberOfItems: posts.length,
+  itemListOrder: 'https://schema.org/ItemListOrderDescending',
+  itemListElement: posts.map((post, index) => ({
+    '@type': 'ListItem',
+    position: (currentPage - 1) * BLOG_PAGE_SIZE + index + 1,
+    url: absoluteUrl(`/blog/${post.id}`, siteUrl),
+    name: post.data.title,
+  })),
+};
+---
+
+<Layout
+  title={pageTitle}
+  description={pageDescription}
+  imageAlt="Wilson Campos, candidato a deputado estadual por Minas Gerais"
+  schemaType="CollectionPage"
+  previousPage={currentPage > 1 ? pageHref(currentPage - 1) : undefined}
+  nextPage={currentPage < totalPages ? pageHref(currentPage + 1) : undefined}
+  mainEntityId={itemListId}
+  structuredData={blogStructuredData}
+>
+  <SiteHeader secondaryHref="/" secondaryLabel="Início" />
+
+  <main class="blog-page">
+    <section class="section">
+      <div
+        class="container"
+        data-blog-archive
+        data-page-size={BLOG_PAGE_SIZE}
+        data-current-page={currentPage}
+      >
+        <div class="section-head blog-archive-head">
+          <p class="eyebrow">Blog</p>
+          <h1 class="title">Ideias, propostas e a caminhada por Itabira.</h1>
+        </div>
+
+        <div class="blog-tools">
+          <form class="blog-search" role="search" data-blog-search-form>
+            <label for="blog-search-input">Buscar nas postagens</label>
+            <div class="blog-search-field">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <circle cx="11" cy="11" r="7"></circle>
+                <path d="m20 20-4-4"></path>
+              </svg>
+              <input
+                id="blog-search-input"
+                type="search"
+                name="busca"
+                placeholder="Busque por tema, cidade ou palavra-chave"
+                autocomplete="off"
+                data-blog-search-input
+              />
+              <button type="button" class="blog-search-clear" data-blog-search-clear hidden>Limpar</button>
+            </div>
+          </form>
+          <p class="blog-results-status" data-blog-status aria-live="polite">{initialStatus}</p>
+        </div>
+
+        {
+          allPosts.length === 0 ? (
+            <p class="lead">Em breve, novos conteúdos por aqui.</p>
+          ) : (
+            <>
+              <div class="blog-list" data-blog-list>
+                {posts.map((post) => <BlogCard post={post} />)}
+              </div>
+              <p class="blog-search-empty" data-blog-empty hidden>
+                Nenhuma postagem corresponde à sua busca. Tente outro termo.
+              </p>
+              <template data-blog-search-template>
+                {allPosts.map((post) => <BlogCard post={post} searchable />)}
+              </template>
+            </>
+          )
+        }
+
+        <nav
+          class="blog-pagination"
+          aria-label="Paginação do blog"
+          data-blog-pagination
+          hidden={totalPages <= 1}
+        >
+          {
+            currentPage > 1 ? (
+              <a class="pagination-link pagination-direction" href={pageHref(currentPage - 1)} rel="prev">← Anterior</a>
+            ) : (
+              <span class="pagination-link pagination-direction is-disabled" aria-disabled="true">← Anterior</span>
+            )
+          }
+
+          <div class="pagination-pages">
+            {pageNumbers.map((page) => (
+              <a
+                class:list={['pagination-link', { 'is-current': page === currentPage }]}
+                href={pageHref(page)}
+                aria-current={page === currentPage ? 'page' : undefined}
+              >
+                {page}
+              </a>
+            ))}
+          </div>
+
+          {
+            currentPage < totalPages ? (
+              <a class="pagination-link pagination-direction" href={pageHref(currentPage + 1)} rel="next">Próxima →</a>
+            ) : (
+              <span class="pagination-link pagination-direction is-disabled" aria-disabled="true">Próxima →</span>
+            )
+          }
+        </nav>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter primaryHref="/" primaryLabel="Início" />
+  <WhatsAppFloat />
+</Layout>
+
+<script is:inline>
+  (() => {
+    const archive = document.querySelector('[data-blog-archive]');
+    if (!archive) return;
+
+    const form = archive.querySelector('[data-blog-search-form]');
+    const input = archive.querySelector('[data-blog-search-input]');
+    const clearButton = archive.querySelector('[data-blog-search-clear]');
+    const list = archive.querySelector('[data-blog-list]');
+    const template = archive.querySelector('[data-blog-search-template]');
+    const empty = archive.querySelector('[data-blog-empty]');
+    const pagination = archive.querySelector('[data-blog-pagination]');
+    const status = archive.querySelector('[data-blog-status]');
+
+    if (!form || !input || !clearButton || !list || !template || !empty || !pagination || !status) return;
+
+    const pageSize = Number(archive.dataset.pageSize) || 4;
+    const initialList = list.innerHTML;
+    const initialPagination = pagination.innerHTML;
+    const initialPaginationHidden = pagination.hidden;
+    const initialStatus = status.textContent;
+    const templateCards = Array.from(template.content.querySelectorAll('.blog-card'));
+    let searchPage = 1;
+
+    const normalize = (value) =>
+      value
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLocaleLowerCase('pt-BR')
+        .trim();
+
+    const updateUrl = (query, page = 1) => {
+      const url = new URL(window.location.href);
+      if (query) {
+        url.searchParams.set('busca', query);
+        if (page > 1) url.searchParams.set('paginaBusca', String(page));
+        else url.searchParams.delete('paginaBusca');
+      } else {
+        url.searchParams.delete('busca');
+        url.searchParams.delete('paginaBusca');
+      }
+      window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+    };
+
+    const makePaginationButton = (label, page, options = {}) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `pagination-link${options.direction ? ' pagination-direction' : ''}${options.current ? ' is-current' : ''}`;
+      button.textContent = label;
+      if (options.current) button.setAttribute('aria-current', 'page');
+      if (options.disabled) {
+        button.disabled = true;
+        button.classList.add('is-disabled');
+        button.setAttribute('aria-disabled', 'true');
+      } else {
+        button.addEventListener('click', () => {
+          searchPage = page;
+          renderSearch(input.value);
+          list.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        });
+      }
+      return button;
+    };
+
+    const renderSearchPagination = (totalPages, query) => {
+      pagination.replaceChildren();
+      pagination.append(makePaginationButton('← Anterior', searchPage - 1, {
+        direction: true,
+        disabled: searchPage === 1,
+      }));
+
+      const pages = document.createElement('div');
+      pages.className = 'pagination-pages';
+      for (let page = 1; page <= totalPages; page += 1) {
+        pages.append(makePaginationButton(String(page), page, { current: page === searchPage }));
+      }
+      pagination.append(pages);
+      pagination.append(makePaginationButton('Próxima →', searchPage + 1, {
+        direction: true,
+        disabled: searchPage === totalPages,
+      }));
+      pagination.hidden = totalPages <= 1;
+      updateUrl(query, searchPage);
+    };
+
+    const restoreInitialPage = () => {
+      list.innerHTML = initialList;
+      pagination.innerHTML = initialPagination;
+      pagination.hidden = initialPaginationHidden;
+      empty.hidden = true;
+      clearButton.hidden = true;
+      status.textContent = initialStatus;
+      updateUrl('');
+    };
+
+    const renderSearch = (rawQuery) => {
+      const query = rawQuery.trim();
+      const normalizedQuery = normalize(query);
+      if (!normalizedQuery) {
+        restoreInitialPage();
+        return;
+      }
+
+      const terms = normalizedQuery.split(/\s+/).filter(Boolean);
+      const matches = templateCards.filter((card) => {
+        const haystack = card.dataset.search || '';
+        return terms.every((term) => haystack.includes(term));
+      });
+      const totalPages = Math.max(1, Math.ceil(matches.length / pageSize));
+      searchPage = Math.min(Math.max(1, searchPage), totalPages);
+      const start = (searchPage - 1) * pageSize;
+      const visibleCards = matches.slice(start, start + pageSize).map((card) => card.cloneNode(true));
+
+      list.replaceChildren(...visibleCards);
+      empty.hidden = matches.length !== 0;
+      clearButton.hidden = false;
+      status.textContent = matches.length === 1
+        ? `1 resultado para “${query}”.`
+        : `${matches.length} resultados para “${query}”.`;
+      renderSearchPagination(totalPages, query);
+    };
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      searchPage = 1;
+      renderSearch(input.value);
+    });
+    input.addEventListener('input', () => {
+      searchPage = 1;
+      renderSearch(input.value);
+    });
+    clearButton.addEventListener('click', () => {
+      input.value = '';
+      searchPage = 1;
+      restoreInitialPage();
+      input.focus();
+    });
+
+    const url = new URL(window.location.href);
+    const initialQuery = url.searchParams.get('busca') || '';
+    if (initialQuery) {
+      input.value = initialQuery;
+      searchPage = Number(url.searchParams.get('paginaBusca')) || 1;
+      renderSearch(initialQuery);
+    }
+  })();
+</script>

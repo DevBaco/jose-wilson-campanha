@@ -1,0 +1,47 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  post: CollectionEntry<'noticias'>;
+  headingLevel?: 'h2' | 'h3';
+  searchable?: boolean;
+}
+
+const { post, headingLevel = 'h2', searchable = false } = Astro.props;
+const Heading = headingLevel;
+const dateFmt = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+const searchText = [
+  post.data.title,
+  post.data.description,
+  post.data.section,
+  ...post.data.keywords,
+]
+  .join(' ')
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .toLocaleLowerCase('pt-BR');
+---
+
+<article class="blog-card" data-search={searchable ? searchText : undefined}>
+  {
+    post.data.image && (
+      <a class="blog-card-media" href={`/blog/${post.id}`}>
+        <img
+          src={post.data.image}
+          alt={post.data.imageAlt ?? ''}
+          width={post.data.imageWidth}
+          height={post.data.imageHeight}
+          loading="lazy"
+          decoding="async"
+          style={post.data.imagePosition ? `object-position: ${post.data.imagePosition}` : undefined}
+        />
+      </a>
+    )
+  }
+  <div class="blog-card-body">
+    <time datetime={post.data.date.toISOString()}>{dateFmt.format(post.data.date)}</time>
+    <Heading><a href={`/blog/${post.id}`}>{post.data.title}</a></Heading>
+    <p>{post.data.description}</p>
+    <a class="blog-more" href={`/blog/${post.id}`}>Ler mais →</a>
+  </div>
+</article>

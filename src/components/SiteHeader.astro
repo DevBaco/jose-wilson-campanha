@@ -1,0 +1,96 @@
+---
+import { INSTAGRAM_HREF, WHATSAPP_HREF } from '../lib/site';
+
+interface Props {
+  mode?: 'home' | 'inner';
+  secondaryHref?: string;
+  secondaryLabel?: string;
+}
+
+const { mode = 'inner', secondaryHref, secondaryLabel } = Astro.props;
+const isHome = mode === 'home';
+const utilityHref = secondaryHref ?? (isHome ? INSTAGRAM_HREF : '/');
+const utilityLabel = secondaryLabel ?? (isHome ? 'Instagram' : 'Início');
+const utilityExternal = utilityHref.startsWith('http');
+
+const navItems = [
+  { label: 'História', href: '#historia' },
+  { label: 'Blog', href: '#blog' },
+  { label: 'Propostas', href: '#bandeiras' },
+  { label: 'Apoie', href: '#apoie' },
+];
+---
+
+<header class:list={['site-header', { 'is-scrolled': !isHome }]}>
+  <div class="container header-inner">
+    <a href={isHome ? '#inicio' : '/'} class="brand" aria-label="Início — Wilson Campos">
+      <span class="brand-wordmark">
+        <b>Wilson Campos</b>
+        <small>Deputado Estadual</small>
+      </span>
+      <span class="brand-sep" aria-hidden="true"></span>
+      <img class="brand-democrata" src="/assets/logo-democrata.jpeg" alt="Democrata 35" width="1290" height="967" />
+    </a>
+
+    {
+      isHome && (
+        <nav class="nav" aria-label="Navegação principal">
+          {navItems.map((item) => <a class="nav-link" href={item.href}>{item.label}</a>)}
+        </nav>
+      )
+    }
+
+    <div class="header-cta">
+      <a
+        class="btn btn-outline"
+        href={utilityHref}
+        target={utilityExternal ? '_blank' : undefined}
+        rel={utilityExternal ? 'noreferrer' : undefined}
+      >
+        {utilityLabel}
+      </a>
+      <a class="btn btn-milho" data-whatsapp href={WHATSAPP_HREF} target="_blank" rel="noreferrer">Quero apoiar</a>
+    </div>
+
+    {
+      isHome && (
+        <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+            <path d="M3 6h18M3 12h18M3 18h18" stroke-linecap="round" />
+          </svg>
+        </button>
+      )
+    }
+  </div>
+
+  {
+    isHome && (
+      <div class="mobile-menu" hidden>
+        <div class="container">
+          {navItems.map((item) => <a class="mobile-link" href={item.href}>{item.label}</a>)}
+          <a class="btn btn-milho" data-whatsapp style="margin-top:14px" href={WHATSAPP_HREF} target="_blank" rel="noreferrer">
+            Quero apoiar
+          </a>
+        </div>
+      </div>
+    )
+  }
+</header>
+
+<script>
+  const menuButton = document.querySelector<HTMLButtonElement>('.menu-toggle');
+  const mobileMenu = document.querySelector<HTMLElement>('.mobile-menu');
+
+  menuButton?.addEventListener('click', () => {
+    const open = menuButton.getAttribute('aria-expanded') === 'true';
+    menuButton.setAttribute('aria-expanded', String(!open));
+    if (mobileMenu) mobileMenu.hidden = open;
+  });
+
+  mobileMenu?.querySelectorAll('a').forEach((link) =>
+    link.addEventListener('click', () => {
+      menuButton?.setAttribute('aria-expanded', 'false');
+      mobileMenu.hidden = true;
+    }),
+  );
+</script>

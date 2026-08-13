@@ -1,0 +1,31 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import WhatsAppFloat from '../components/WhatsAppFloat.astro';
+---
+
+<Layout
+  title="Página não encontrada | Wilson Campos"
+  description="A página solicitada não foi encontrada. Volte ao site de Wilson Campos ou acesse as notícias da campanha."
+  noindex
+>
+  <SiteHeader secondaryHref="/blog" secondaryLabel="Blog" />
+
+  <main class="blog-page">
+    <section class="section">
+      <div class="container post">
+        <p class="eyebrow">Erro 404</p>
+        <h1 class="title">Esta página não foi encontrada.</h1>
+        <p class="lead">O endereço pode ter mudado ou não existir mais. Você pode voltar ao início ou acompanhar as notícias.</p>
+        <div class="post-cta-actions">
+          <a class="btn btn-milho" href="/">Voltar ao início</a>
+          <a class="btn btn-outline" href="/blog">Acessar o blog</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter primaryHref="/" primaryLabel="Início" />
+  <WhatsAppFloat />
+</Layout>

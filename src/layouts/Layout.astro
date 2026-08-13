@@ -1,0 +1,147 @@
+---
+import '../styles/global.css';
+import { SITE_URL, absoluteUrl } from '../lib/site';
+
+type SchemaNode = Record<string, unknown>;
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  imageAlt?: string;
+  imageWidth?: number;
+  imageHeight?: number;
+  imageType?: string;
+  type?: 'website' | 'article';
+  schemaType?: 'WebPage' | 'CollectionPage' | 'ProfilePage';
+  author?: string;
+  publishedTime?: string;
+  modifiedTime?: string;
+  previousPage?: string;
+  nextPage?: string;
+  noindex?: boolean;
+  mainEntityId?: string;
+  breadcrumbId?: string;
+  structuredData?: SchemaNode | SchemaNode[];
+}
+
+const {
+  title = 'Wilson Campos | Candidato a Deputado Estadual por MG',
+  description =
+    'Conheça Wilson Campos, candidato a deputado estadual por Minas Gerais: gratidão por Itabira, desenvolvimento econômico, educação e geração de oportunidades.',
+  image = '/assets/wilson-campos-card-campanha.png',
+  imageAlt = 'Wilson Campos, candidato a deputado estadual por Minas Gerais',
+  imageWidth = 1240,
+  imageHeight = 1240,
+  imageType = 'image/png',
+  type = 'website',
+  schemaType = 'WebPage',
+  author,
+  publishedTime,
+  modifiedTime,
+  previousPage,
+  nextPage,
+  noindex = false,
+  mainEntityId,
+  breadcrumbId,
+  structuredData = [],
+} = Astro.props;
+
+const site = Astro.site ?? new URL(SITE_URL);
+const canonical = absoluteUrl(Astro.url.pathname, site);
+const socialImage = absoluteUrl(image, site);
+const previousUrl = previousPage ? absoluteUrl(previousPage, site) : undefined;
+const nextUrl = nextPage ? absoluteUrl(nextPage, site) : undefined;
+const siteId = absoluteUrl('/#website', site);
+const pageId = `${canonical}#webpage`;
+const imageId = `${canonical}#primaryimage`;
+
+const pageSchema: SchemaNode = {
+  '@type': schemaType,
+  '@id': pageId,
+  url: canonical,
+  name: title,
+  description,
+  inLanguage: 'pt-BR',
+  isPartOf: { '@id': siteId },
+  primaryImageOfPage: {
+    '@type': 'ImageObject',
+    '@id': imageId,
+    url: socialImage,
+    contentUrl: socialImage,
+    caption: imageAlt,
+    width: imageWidth,
+    height: imageHeight,
+  },
+  ...(mainEntityId ? { mainEntity: { '@id': mainEntityId } } : {}),
+  ...(breadcrumbId ? { breadcrumb: { '@id': breadcrumbId } } : {}),
+};
+
+const extraSchema = Array.isArray(structuredData) ? structuredData : [structuredData];
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@graph': [pageSchema, ...extraSchema],
+}).replace(/</g, '\\u003c');
+---
+
+<!doctype html>
+<html lang="pt-BR" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/favicon.png" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta
+      name="robots"
+      content={noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'}
+    />
+    {author && <meta name="author" content={author} />}
+    <link rel="canonical" href={canonical} />
+    {previousUrl && <link rel="prev" href={previousUrl} />}
+    {nextUrl && <link rel="next" href={nextUrl} />}
+    <meta name="theme-color" content="#00214a" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content={type} />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:site_name" content="Wilson Campos" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={socialImage} />
+    <meta property="og:image:secure_url" content={socialImage} />
+    <meta property="og:image:type" content={imageType} />
+    <meta property="og:image:width" content={String(imageWidth)} />
+    <meta property="og:image:height" content={String(imageHeight)} />
+    <meta property="og:image:alt" content={imageAlt} />
+    <meta property="og:url" content={canonical} />
+    {type === 'article' && publishedTime && <meta property="article:published_time" content={publishedTime} />}
+    {type === 'article' && modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+    {type === 'article' && author && <meta property="article:author" content={author} />}
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImage} />
+    <meta name="twitter:image:alt" content={imageAlt} />
+
+    <script type="application/ld+json" set:html={jsonLd}></script>
+
+    <!-- Fonts do design system -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Archivo+Expanded:wght@600;700;800;900&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..500&family=Caveat:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

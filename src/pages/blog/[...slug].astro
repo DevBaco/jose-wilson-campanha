@@ -1,0 +1,277 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import WhatsAppFloat from '../../components/WhatsAppFloat.astro';
+import { getCollection, render } from 'astro:content';
+import { SITE_URL, WHATSAPP_HREF, absoluteUrl } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('noticias', ({ data }) => !data.draft);
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const whatsappHref = WHATSAPP_HREF;
+const siteUrl = Astro.site ?? new URL(SITE_URL);
+const homeUrl = absoluteUrl('/', siteUrl);
+const articleUrl = absoluteUrl(`/blog/${post.id}`, siteUrl);
+const articleImage = post.data.image ? absoluteUrl(post.data.image, siteUrl) : absoluteUrl('/assets/wilson-campos-card-campanha.png', siteUrl);
+const articleImageWidth = post.data.imageWidth ?? 1240;
+const articleImageHeight = post.data.imageHeight ?? 1240;
+const publishedTime = post.data.date.toISOString();
+const modifiedTime = (post.data.updated ?? post.data.date).toISOString();
+const articleId = `${articleUrl}#article`;
+const breadcrumbId = `${articleUrl}#breadcrumb`;
+const personId = `${homeUrl}#wilson-campos`;
+const campaignId = `${homeUrl}#campaign`;
+const documentTitle = `${post.data.seoTitle ?? post.data.title} | Wilson Campos`;
+const videoStructuredData = post.data.video
+  ? {
+      '@type': 'VideoObject',
+      name: post.data.video.title,
+      description: post.data.video.caption ?? post.data.description,
+      thumbnailUrl: absoluteUrl(post.data.video.poster, siteUrl),
+      contentUrl: absoluteUrl(post.data.video.src, siteUrl),
+      uploadDate: publishedTime,
+      duration: post.data.video.duration,
+      width: post.data.video.width,
+      height: post.data.video.height,
+      inLanguage: 'pt-BR',
+    }
+  : undefined;
+
+const articleAuthor =
+  post.data.author === 'Wilson Campos'
+    ? { '@id': personId }
+    : {
+        '@type': 'Organization',
+        name: post.data.author,
+        url: homeUrl,
+      };
+
+const articleStructuredData = [
+  {
+    '@type': 'BlogPosting',
+    '@id': articleId,
+    url: articleUrl,
+    mainEntityOfPage: { '@id': `${articleUrl}#webpage` },
+    headline: post.data.title,
+    description: post.data.description,
+    image: {
+      '@type': 'ImageObject',
+      url: articleImage,
+      width: articleImageWidth,
+      height: articleImageHeight,
+      caption: post.data.imageAlt,
+    },
+    datePublished: publishedTime,
+    dateModified: modifiedTime,
+    author: articleAuthor,
+    publisher: {
+      '@type': 'Organization',
+      '@id': campaignId,
+      name: 'Wilson Campos',
+      url: homeUrl,
+      logo: {
+        '@type': 'ImageObject',
+        url: absoluteUrl('/assets/logo-democrata.jpeg', siteUrl),
+        width: 1290,
+        height: 967,
+      },
+    },
+    about: { '@id': personId },
+    articleSection: post.data.section,
+    keywords: post.data.keywords,
+    ...(videoStructuredData ? { video: videoStructuredData } : {}),
+    inLanguage: 'pt-BR',
+    isAccessibleForFree: true,
+  },
+  {
+    '@type': 'BreadcrumbList',
+    '@id': breadcrumbId,
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Início',
+        item: homeUrl,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Blog',
+        item: absoluteUrl('/blog', siteUrl),
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: post.data.title,
+        item: articleUrl,
+      },
+    ],
+  },
+];
+
+const dateFmt = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+const isMemoryPost = post.data.section === 'Gratidão por Itabira';
+const conversionEyebrow = isMemoryPost ? 'Gratidão por Itabira' : 'Participe da caminhada';
+const conversionTitle = isMemoryPost ? 'Você também acredita em Itabira?' : 'Quer conversar com o Wilson?';
+const conversionText = isMemoryPost
+  ? 'Conte o que sua rua, seu bairro e seu negócio precisam e converse diretamente com o Wilson.'
+  : 'Envie suas ideias, conte as prioridades da sua comunidade e participe dessa conversa sobre o futuro de Itabira e de Minas Gerais.';
+---
+
+<Layout
+  title={documentTitle}
+  description={post.data.description}
+  image={post.data.image}
+  imageAlt={post.data.imageAlt}
+  imageWidth={articleImageWidth}
+  imageHeight={articleImageHeight}
+  type="article"
+  author={post.data.author}
+  publishedTime={publishedTime}
+  modifiedTime={modifiedTime}
+  mainEntityId={articleId}
+  breadcrumbId={breadcrumbId}
+  structuredData={articleStructuredData}
+>
+  <SiteHeader secondaryHref="/blog" secondaryLabel="Blog" />
+
+  <main class="blog-page">
+    <article class="section post-section">
+      <div class="container post">
+        <a class="post-back" href="/blog" aria-label="Voltar para todas as postagens">
+          <span aria-hidden="true">←</span>
+          Todas as postagens
+        </a>
+        <p class="eyebrow">Blog</p>
+        <h1 class="title">{post.data.title}</h1>
+        <p class="post-meta">
+          <time datetime={post.data.date.toISOString()}>{dateFmt.format(post.data.date)}</time>
+          {
+            post.data.updated && (
+              <>
+                <span>·</span>
+                <span>Atualizado em <time datetime={post.data.updated.toISOString()}>{dateFmt.format(post.data.updated)}</time></span>
+              </>
+            )
+          }
+          <span>·</span>
+          <span>{post.data.author}</span>
+        </p>
+        <button
+          type="button"
+          class="post-share"
+          data-share-button
+          data-share-url={articleUrl}
+          data-share-title={post.data.title}
+          data-share-text={post.data.description}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          </svg>
+          <span data-share-label>Compartilhar</span>
+        </button>
+        {
+          post.data.video ? (
+            <figure class="post-video">
+              <video
+                controls
+                preload="none"
+                playsinline
+                poster={post.data.video.poster}
+                width={post.data.video.width}
+                height={post.data.video.height}
+                aria-label={post.data.video.title}
+              >
+                <source src={post.data.video.src} type="video/mp4" />
+                Seu navegador não oferece suporte à reprodução deste vídeo.
+              </video>
+              {post.data.video.caption && <figcaption>{post.data.video.caption}</figcaption>}
+            </figure>
+          ) : post.data.image ? (
+            <figure class="post-cover">
+              <img
+                src={post.data.image}
+                alt={post.data.imageAlt ?? ''}
+                width={post.data.imageWidth}
+                height={post.data.imageHeight}
+                loading="eager"
+                fetchpriority="high"
+                decoding="async"
+                style={post.data.imagePosition ? `object-position: ${post.data.imagePosition}` : undefined}
+              />
+            </figure>
+          ) : null
+        }
+        <div class="post-content">
+          <Content />
+        </div>
+        <aside class="post-conversion">
+          <p class="eyebrow">{conversionEyebrow}</p>
+          <h2>{conversionTitle}</h2>
+          <p>{conversionText}</p>
+          <div class="post-cta-actions">
+            <a class="btn btn-whatsapp post-cta" href={whatsappHref} target="_blank" rel="noreferrer">Fale com o Wilson</a>
+            <a class="btn btn-outline" href="/#historia">Conheça sua trajetória</a>
+          </div>
+        </aside>
+      </div>
+    </article>
+  </main>
+
+  <SiteFooter primaryHref="/" primaryLabel="Início" />
+  <WhatsAppFloat />
+</Layout>
+
+<script is:inline>
+  (() => {
+    const button = document.querySelector('[data-share-button]');
+    if (!button) return;
+
+    const label = button.querySelector('[data-share-label]');
+    const defaultLabel = label ? label.textContent : '';
+    let resetTimer;
+
+    const setLabel = (text, revertAfterMs) => {
+      if (!label) return;
+      label.textContent = text;
+      clearTimeout(resetTimer);
+      if (revertAfterMs) {
+        resetTimer = setTimeout(() => {
+          label.textContent = defaultLabel;
+        }, revertAfterMs);
+      }
+    };
+
+    button.addEventListener('click', async () => {
+      const url = button.dataset.shareUrl || window.location.href;
+      const title = button.dataset.shareTitle;
+      const text = button.dataset.shareText;
+
+      if (navigator.share) {
+        try {
+          await navigator.share({ title, text, url });
+        } catch (error) {
+          // Compartilhamento cancelado pelo usuário — nada a fazer.
+        }
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(url);
+        setLabel('Link copiado!', 2000);
+      } catch (error) {
+        window.prompt('Copie o link da postagem:', url);
+      }
+    });
+  })();
+</script>

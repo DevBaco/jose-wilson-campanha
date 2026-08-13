@@ -1,0 +1,31 @@
+---
+import BlogArchivePage from '../../../components/BlogArchivePage.astro';
+import { getCollection } from 'astro:content';
+import { BLOG_PAGE_SIZE } from '../../../lib/blog';
+
+export async function getStaticPaths() {
+  const allPosts = (await getCollection('noticias', ({ data }) => !data.draft)).sort(
+    (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+  );
+  const totalPages = Math.max(1, Math.ceil(allPosts.length / BLOG_PAGE_SIZE));
+
+  return Array.from({ length: Math.max(0, totalPages - 1) }, (_, index) => {
+    const currentPage = index + 2;
+    const start = (currentPage - 1) * BLOG_PAGE_SIZE;
+
+    return {
+      params: { page: String(currentPage) },
+      props: {
+        posts: allPosts.slice(start, start + BLOG_PAGE_SIZE),
+        allPosts,
+        currentPage,
+        totalPages,
+      },
+    };
+  });
+}
+
+const { posts, allPosts, currentPage, totalPages } = Astro.props;
+---
+
+<BlogArchivePage posts={posts} allPosts={allPosts} currentPage={currentPage} totalPages={totalPages} />
