@@ -1,5 +1,6 @@
 ---
-import { INSTAGRAM_HREF, WHATSAPP_HREF } from '../lib/site';
+import SocialLinks from './SocialLinks.astro';
+import { WHATSAPP_HREF } from '../lib/site';
 
 interface Props {
   mode?: 'home' | 'inner';
@@ -9,27 +10,32 @@ interface Props {
 
 const { mode = 'inner', secondaryHref, secondaryLabel } = Astro.props;
 const isHome = mode === 'home';
-const utilityHref = secondaryHref ?? (isHome ? INSTAGRAM_HREF : '/');
-const utilityLabel = secondaryLabel ?? (isHome ? 'Instagram' : 'Início');
-const utilityExternal = utilityHref.startsWith('http');
+/* Na home o único botão é o "Quero apoiar"; nas páginas internas o botão
+   secundário continua sendo o caminho de volta (Início / Blog). */
+const utilityHref = secondaryHref ?? (isHome ? null : '/');
+const utilityLabel = secondaryLabel ?? (isHome ? null : 'Início');
+const showUtility = Boolean(utilityHref && utilityLabel);
+const utilityExternal = utilityHref?.startsWith('http') ?? false;
 
+/* a ordem acompanha a da home: apresentação, história, bandeira, blog, apoio */
 const navItems = [
+  { label: 'Apresentação', href: '#apresentacao' },
   { label: 'História', href: '#historia' },
+  { label: 'Propostas', href: '#economia' },
   { label: 'Blog', href: '#blog' },
-  { label: 'Propostas', href: '#bandeiras' },
   { label: 'Apoie', href: '#apoie' },
 ];
 ---
 
-<header class:list={['site-header', { 'is-scrolled': !isHome }]}>
-  <div class="container header-inner">
+<header class="site-header">
+  <div class="wrap header-inner">
     <a href={isHome ? '#inicio' : '/'} class="brand" aria-label="Início — Wilson Campos">
       <span class="brand-wordmark">
         <b>Wilson Campos</b>
-        <small>Deputado Estadual</small>
+        <small>Candidato a Deputado Estadual</small>
       </span>
       <span class="brand-sep" aria-hidden="true"></span>
-      <img class="brand-democrata" src="/assets/logo-democrata.jpeg" alt="Democrata 35" width="1290" height="967" />
+      <img class="brand-democrata" src="/assets/logo-democrata.png" alt="Democrata 35" width="256" height="256" />
     </a>
 
     {
@@ -41,14 +47,19 @@ const navItems = [
     }
 
     <div class="header-cta">
-      <a
-        class="btn btn-outline"
-        href={utilityHref}
-        target={utilityExternal ? '_blank' : undefined}
-        rel={utilityExternal ? 'noreferrer' : undefined}
-      >
-        {utilityLabel}
-      </a>
+      {
+        showUtility && (
+          <a
+            class="btn btn-outline"
+            href={utilityHref}
+            target={utilityExternal ? '_blank' : undefined}
+            rel={utilityExternal ? 'noreferrer' : undefined}
+          >
+            {utilityLabel}
+          </a>
+        )
+      }
+      <SocialLinks class="header-social" />
       <a class="btn btn-milho" data-whatsapp href={WHATSAPP_HREF} target="_blank" rel="noreferrer">Quero apoiar</a>
     </div>
 
@@ -66,8 +77,9 @@ const navItems = [
   {
     isHome && (
       <div class="mobile-menu" hidden>
-        <div class="container">
+        <div class="wrap">
           {navItems.map((item) => <a class="mobile-link" href={item.href}>{item.label}</a>)}
+          <SocialLinks class="mobile-social" />
           <a class="btn btn-milho" data-whatsapp style="margin-top:14px" href={WHATSAPP_HREF} target="_blank" rel="noreferrer">
             Quero apoiar
           </a>

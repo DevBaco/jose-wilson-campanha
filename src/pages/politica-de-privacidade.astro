@@ -1,0 +1,138 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import WhatsAppFloat from '../components/WhatsAppFloat.astro';
+import { EMAIL, PHONE_DISPLAY, PRIVACY_UPDATED_AT } from '../lib/site';
+
+const dateFmt = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'long', timeZone: 'UTC' });
+const updatedAt = new Date(PRIVACY_UPDATED_AT);
+---
+
+<Layout
+  title="Política de Privacidade | Wilson Campos"
+  description="Como a campanha de Wilson Campos coleta, usa, guarda e protege os dados pessoais informados neste site, conforme a LGPD."
+>
+  <SiteHeader secondaryHref="/" secondaryLabel="Início" />
+
+  <main class="blog-page">
+    <article class="section post-section">
+      <div class="wrap post">
+        <a class="post-back" href="/" aria-label="Voltar para o início">
+          <span aria-hidden="true">←</span>
+          Voltar ao início
+        </a>
+        <p class="eyebrow">Transparência</p>
+        <h1 class="title">Política de Privacidade</h1>
+        <p class="post-meta">
+          <time datetime={updatedAt.toISOString()}>Atualizada em {dateFmt.format(updatedAt)}</time>
+        </p>
+
+        <div class="post-content">
+          <p>
+            Esta política explica quais dados pessoais a campanha de Wilson Campos coleta neste site, para que eles são
+            usados, por quanto tempo ficam guardados e como você pode pedir para alterá-los ou apagá-los, conforme a Lei
+            Geral de Proteção de Dados (Lei nº 13.709/2018).
+          </p>
+
+          <h2>Quem é responsável pelos seus dados</h2>
+          <p>
+            O responsável (controlador) pelo tratamento dos dados é a campanha de <b>Wilson Campos</b>, candidato a
+            deputado estadual por Minas Gerais, em Itabira. Para qualquer assunto relacionado a esta política, o contato
+            é <a href={`mailto:${EMAIL}`}>{EMAIL}</a> ou o telefone {PHONE_DISPLAY}.
+          </p>
+
+          <h2>Quais dados coletamos</h2>
+          <p>Coletamos apenas o que você informa por vontade própria no formulário de apoio deste site:</p>
+          <ul>
+            <li>nome completo;</li>
+            <li>e-mail;</li>
+            <li>telefone ou WhatsApp, quando informado;</li>
+            <li>cidade e profissão, quando informadas;</li>
+            <li>a mensagem sobre como você quer participar da campanha.</li>
+          </ul>
+          <p>
+            Não pedimos, em nenhum momento, CPF, RG, título de eleitor, dados bancários ou dados de cartão. Se você
+            receber algum pedido desse tipo em nome desta campanha, desconfie e nos avise.
+          </p>
+
+          <h2>Para que usamos</h2>
+          <ul>
+            <li>entrar em contato com você sobre a campanha;</li>
+            <li>enviar notícias, propostas e convites para eventos;</li>
+            <li>organizar a participação de quem se voluntaria.</li>
+          </ul>
+          <p>
+            Seus dados <b>não são vendidos, alugados nem cedidos</b> a terceiros para fins comerciais ou publicitários.
+          </p>
+
+          <h2>Com que base legal</h2>
+          <p>
+            O tratamento é feito com base no <b>seu consentimento</b> (art. 7º, inciso I, da LGPD), manifestado quando
+            você marca a caixa de concordância antes de enviar o formulário. Você pode retirar esse consentimento a
+            qualquer momento, sem qualquer justificativa.
+          </p>
+
+          <h2>Com quem compartilhamos</h2>
+          <p>
+            Os dados são acessados pela equipe da campanha e pelos serviços que fazem o site funcionar — hospedagem,
+            envio de e-mail e ferramentas de organização dos contatos —, sempre limitados ao necessário para o fim
+            descrito acima. Também podemos compartilhar informações quando houver obrigação legal ou determinação da
+            Justiça Eleitoral.
+          </p>
+
+          <h2>Por quanto tempo guardamos</h2>
+          <p>
+            Os dados ficam guardados enquanto durar a campanha e por até <b>12 meses após o fim do período eleitoral</b>,
+            prazo em que ainda podem ser necessários para prestação de contas. Depois disso são apagados. Se você pedir a
+            exclusão antes, ela é feita assim que recebermos o pedido.
+          </p>
+
+          <h2>Seus direitos</h2>
+          <p>A LGPD garante a você, a qualquer momento e sem custo, o direito de:</p>
+          <ul>
+            <li>confirmar se tratamos seus dados e acessar o que temos sobre você;</li>
+            <li>corrigir dados incompletos, desatualizados ou errados;</li>
+            <li>pedir a exclusão dos dados tratados com base no consentimento;</li>
+            <li>revogar o consentimento e deixar de receber comunicações;</li>
+            <li>saber com quem compartilhamos seus dados;</li>
+            <li>solicitar a portabilidade dos dados a outro fornecedor.</li>
+          </ul>
+          <p>
+            Para exercer qualquer um deles, escreva para <a href={`mailto:${EMAIL}`}>{EMAIL}</a>. Respondemos em até 15
+            dias.
+          </p>
+
+          <h2>Cookies e medição de audiência</h2>
+          <p>
+            Este site <b>não usa cookies de rastreamento, remarketing ou perfilamento</b>, e por isso não exibe banner de
+            cookies. As fontes tipográficas das páginas são servidas pelo Google Fonts, o que significa que o endereço de
+            IP do seu navegador é enviado ao Google no carregamento da página.
+          </p>
+
+          <h2>Segurança</h2>
+          <p>
+            O site é servido integralmente por conexão criptografada (HTTPS) e o acesso aos contatos recebidos é
+            restrito à equipe da campanha. Nenhum sistema é totalmente imune a incidentes; se ocorrer algum que traga
+            risco relevante a você, avisaremos você e a Autoridade Nacional de Proteção de Dados (ANPD).
+          </p>
+
+          <h2>Conteúdo de terceiros</h2>
+          <p>
+            As páginas trazem links para redes sociais e WhatsApp. Ao clicar neles você passa a ser regido pelas
+            políticas de privacidade dessas plataformas, sobre as quais esta campanha não tem controle.
+          </p>
+
+          <h2>Mudanças nesta política</h2>
+          <p>
+            Se esta política mudar, a data de atualização no topo da página muda junto. Mudanças relevantes na forma de
+            tratar seus dados serão comunicadas por e-mail a quem já estiver cadastrado.
+          </p>
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <SiteFooter primaryHref="/" primaryLabel="Início" />
+  <WhatsAppFloat />
+</Layout>

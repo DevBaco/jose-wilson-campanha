@@ -29,11 +29,11 @@ const {
   title = 'Wilson Campos | Candidato a Deputado Estadual por MG',
   description =
     'Conheça Wilson Campos, candidato a deputado estadual por Minas Gerais: gratidão por Itabira, desenvolvimento econômico, educação e geração de oportunidades.',
-  image = '/assets/wilson-campos-card-campanha.png',
+  image = '/assets/wilson-campos-card-campanha-og.jpg',
   imageAlt = 'Wilson Campos, candidato a deputado estadual por Minas Gerais',
-  imageWidth = 1240,
-  imageHeight = 1240,
-  imageType = 'image/png',
+  imageWidth = 1200,
+  imageHeight = 1200,
+  imageType = 'image/jpeg',
   type = 'website',
   schemaType = 'WebPage',
   author,
@@ -104,7 +104,7 @@ const jsonLd = JSON.stringify({
     <link rel="canonical" href={canonical} />
     {previousUrl && <link rel="prev" href={previousUrl} />}
     {nextUrl && <link rel="next" href={nextUrl} />}
-    <meta name="theme-color" content="#00214a" />
+    <meta name="theme-color" content="#0057b8" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
 
     <!-- Open Graph -->
@@ -133,11 +133,11 @@ const jsonLd = JSON.stringify({
 
     <script type="application/ld+json" set:html={jsonLd}></script>
 
-    <!-- Fonts do design system -->
+    <!-- Fonts do design system: Inter (display) + Rubik (leitura) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Archivo+Expanded:wght@600;700;800;900&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..500&family=Caveat:wght@600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Rubik:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
   </head>

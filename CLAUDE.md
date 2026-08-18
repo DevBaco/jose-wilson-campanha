@@ -71,7 +71,7 @@ A campanha terá comunicação frequente com a população, com **atualizações
 **Partido:** Democratas
 **Cidade:** Itabira, Minas Gerais
 **Telefone:** (31) 99963-7470
-**E-mail:** [jwilson.campos@gmail.com](mailto:jwilson.campos@gmail.com)
+**E-mail:** [contato@wilsoncamposoficial.com.br](mailto:contato@wilsoncamposoficial.com.br)
 
 ## Materiais da campanha
 

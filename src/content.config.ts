@@ -1,9 +1,14 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { wordpressPosts } from './lib/wordpress';
 
-// Blog servido a partir de arquivos .md em src/content/noticias.
+/* Fonte do blog: com WP_URL definido, o conteúdo vem do WordPress headless;
+   sem ela, dos arquivos .md em src/content/noticias. O schema e as páginas
+   são os mesmos nos dois casos. */
+const WP_URL = process.env.WP_URL ?? import.meta.env?.WP_URL;
+
 const noticias = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/noticias' }),
+  loader: WP_URL ? wordpressPosts(WP_URL) : glob({ pattern: '**/*.md', base: './src/content/noticias' }),
   schema: z.object({
     title: z.string(),
     seoTitle: z.string().optional(),

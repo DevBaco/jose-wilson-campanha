@@ -1,0 +1,3 @@
+# Redirecionamentos do Cloudflare Pages. Copiado para dist/ no build.
+# Um endereço só: www manda para o domínio sem www, que é o canonical do site.
+https://www.wilsoncamposoficial.com.br/* https://wilsoncamposoficial.com.br/:splat 301

@@ -1,5 +1,6 @@
 ---
-import { INSTAGRAM_HREF, TIKTOK_HREF, WHATSAPP_HREF } from '../lib/site';
+import SocialLinks from './SocialLinks.astro';
+import { EMAIL, PRIVACY_PATH } from '../lib/site';
 
 interface Props {
   primaryHref?: string;
@@ -7,13 +8,16 @@ interface Props {
 }
 
 const { primaryHref = '/blog', primaryLabel = 'Blog' } = Astro.props;
+
+/* o ano vem do build: não vira 2026 eterno na virada do ano */
+const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer">
-  <div class="container footer-grid">
+  <div class="wrap footer-grid">
     <div class="footer-brand">
       <div class="footer-logos">
-        <img src="/assets/logo-democrata.jpeg" alt="Democrata 35" width="1290" height="967" />
+        <img src="/assets/logo-democrata.png" alt="Democrata 35" width="256" height="256" />
       </div>
       <div>
         <strong>Wilson Campos</strong>
@@ -21,11 +25,15 @@ const { primaryHref = '/blog', primaryLabel = 'Blog' } = Astro.props;
       </div>
     </div>
     <div class="footer-links">
+      <SocialLinks whatsapp label="Redes sociais e WhatsApp de Wilson Campos" />
       <a href={primaryHref}>{primaryLabel}</a>
-      <a data-whatsapp href={WHATSAPP_HREF} target="_blank" rel="noreferrer">WhatsApp</a>
-      <a href={INSTAGRAM_HREF} target="_blank" rel="noreferrer">Instagram</a>
-      <a href={TIKTOK_HREF} target="_blank" rel="noreferrer">TikTok</a>
+      <a class="footer-email" href={`mailto:${EMAIL}`}>{EMAIL}</a>
+      <a href={PRIVACY_PATH}>Política de Privacidade</a>
       <span>Itabira · Minas Gerais</span>
     </div>
+  </div>
+
+  <div class="wrap footer-legal">
+    <p>© {year} Wilson Campos. Todos os direitos reservados.</p>
   </div>
 </footer>

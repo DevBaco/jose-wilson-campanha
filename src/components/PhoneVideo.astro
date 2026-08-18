@@ -1,0 +1,52 @@
+---
+interface Props {
+  src: string;
+  poster: string;
+  label: string;
+  caption?: string;
+  width?: number;
+  height?: number;
+  class?: string;
+}
+
+const { src, poster, label, caption, width = 576, height = 1024, class: className } = Astro.props;
+---
+
+{/* Moldura de celular 9:16. O vídeo entra com preload="none": até o clique
+    no play só o poster é baixado, então a seção não pesa no carregamento. */}
+<figure class={className ? `phone-video ${className}` : 'phone-video'}>
+  <div class="phone-frame">
+    <span class="phone-notch" aria-hidden="true"></span>
+    <video class="phone-screen" preload="none" playsinline poster={poster} width={width} height={height} aria-label={label}>
+      <source src={src} type="video/mp4" />
+      Seu navegador não oferece suporte à reprodução deste vídeo.
+    </video>
+    <button class="phone-play" type="button" aria-label={`Assistir: ${label}`}>
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M8 5.14v13.72a1 1 0 0 0 1.52.85l11.14-6.86a1 1 0 0 0 0-1.7L9.52 4.29A1 1 0 0 0 8 5.14Z" />
+      </svg>
+    </button>
+  </div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.phone-video').forEach((wrapper) => {
+    const video = wrapper.querySelector<HTMLVideoElement>('.phone-screen');
+    const play = wrapper.querySelector<HTMLButtonElement>('.phone-play');
+    if (!video || !play) return;
+
+    play.addEventListener('click', () => {
+      /* os controles nativos só entram depois do play: assim o cartão fica
+         limpo enquanto o vídeo é só um pôster */
+      video.controls = true;
+      wrapper.classList.add('is-playing');
+      void video.play();
+    });
+
+    video.addEventListener('ended', () => {
+      video.controls = false;
+      wrapper.classList.remove('is-playing');
+    });
+  });
+</script>
