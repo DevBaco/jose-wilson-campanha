@@ -48,6 +48,15 @@ function toIso(gmt: string): string {
   return gmt.endsWith('Z') ? gmt : `${gmt}Z`;
 }
 
+/* O nome público do WordPress começa igual ao login: se ninguém preencheu o
+   "exibir nome publicamente como", o e-mail de quem instalou vazaria como
+   autor em todo post do site. */
+function authorName(raw: string | undefined): string {
+  const name = (raw ?? '').trim();
+  if (!name || name.includes('@')) return 'Wilson Campos';
+  return name;
+}
+
 function termsOf(post: WpPost, taxonomy: string): string[] {
   const groups = post._embedded?.['wp:term'] ?? [];
   return groups
@@ -94,7 +103,7 @@ export function wordpressPosts(endpoint: string): Loader {
             description: toText(post.excerpt.rendered),
             date: toIso(post.date_gmt),
             updated: toIso(post.modified_gmt),
-            author: post._embedded?.author?.[0]?.name || 'Wilson Campos',
+            author: authorName(post._embedded?.author?.[0]?.name),
             section: categories[0] ?? 'Notícias',
             keywords: tags,
             image: media?.source_url,
