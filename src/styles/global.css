@@ -2260,6 +2260,14 @@
   @media (min-width: 1024px) {
     .blog-head-row {
       grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+    }
+
+    /* o título fica em uma linha só no desktop, e a fonte cede antes de
+       deixar a frase quebrar */
+    .blog-head-row .title {
+      font-size: clamp(30px, 3vw, 44px);
+      white-space: nowrap;
     }
   }
 }

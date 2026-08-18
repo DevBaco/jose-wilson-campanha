@@ -10,7 +10,14 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-const WC_DEPLOY_HOOK_URL = getenv('WC_DEPLOY_HOOK_URL') ?: 'COLE_A_URL_DO_DEPLOY_HOOK';
+/* define() em vez de const: const só aceita valor literal, e uma chamada de
+   função ali derruba o WordPress inteiro com erro de parse. */
+define('WC_DEPLOY_HOOK_URL', getenv('WC_DEPLOY_HOOK_URL') ?: '');
+
+/* sem URL configurada o plugin fica inerte, em vez de disparar POST a vazio */
+if (!WC_DEPLOY_HOOK_URL) {
+    return;
+}
 
 function wc_disparar_build()
 {
