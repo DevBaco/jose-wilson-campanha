@@ -10,7 +10,9 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "check:blog": "node scripts/check-blog.mjs"
+    "check:blog": "node scripts/check-blog.mjs",
+    "test:form": "node scripts/test-form.mjs",
+    "audit:mobile": "node scripts/audit-mobile.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",

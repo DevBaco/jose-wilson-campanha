@@ -11,6 +11,7 @@ import {
   EMAIL,
   FACEBOOK_HREF,
   FORM_ENDPOINT,
+  WHATSAPP_HREF,
   INSTAGRAM_HREF,
   PHONE_DISPLAY,
   PRIVACY_PATH,
@@ -506,6 +507,27 @@ const economyChain = [
 
             <p class="support-form-status" data-support-status role="status" aria-live="polite" hidden></p>
           </form>
+
+          {/* Tela de obrigado: entra no lugar do formulário depois do envio */}
+          <div class="support-done" data-support-done hidden>
+            <span class="support-done-check" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m4 12.5 5.5 5.5L20 7" />
+              </svg>
+            </span>
+            <h2 tabindex="-1" data-support-done-title>Obrigado, seu apoio foi registrado!</h2>
+            <p>
+              A campanha recebeu seus dados e entra em contato em breve. Enquanto isso, você já pode ajudar de outras
+              formas:
+            </p>
+            <div class="support-done-actions">
+              <a class="btn btn-whatsapp" href={WHATSAPP_HREF} target="_blank" rel="noreferrer">Falar no WhatsApp</a>
+              <a class="btn btn-outline" href={INSTAGRAM_HREF} target="_blank" rel="noreferrer">Seguir no Instagram</a>
+            </div>
+            <button class="support-done-again" type="button" data-support-again>
+              Cadastrar outra pessoa
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -525,7 +547,30 @@ const economyChain = [
     if (form) {
       const botao = form.querySelector('[data-support-submit]');
       const status = form.querySelector('[data-support-status]');
+      const obrigado = document.querySelector('[data-support-done]');
+      const tituloObrigado = obrigado?.querySelector('[data-support-done-title]');
       const rotuloOriginal = botao.textContent;
+
+      /* Máscara de telefone: formata enquanto digita, aceita celular (9
+         dígitos) e fixo (8), e sobrevive a colar texto com pontuação. */
+      const telefone = form.querySelector('[name="telefone"]');
+      if (telefone) {
+        const formatar = (valor) => {
+          const d = valor.replace(/\D/g, '').slice(0, 11);
+          if (d.length <= 2) return d.length ? '(' + d : '';
+          const ddd = '(' + d.slice(0, 2) + ') ';
+          if (d.length <= 6) return ddd + d.slice(2);
+          if (d.length <= 10) return ddd + d.slice(2, 6) + '-' + d.slice(6);
+          return ddd + d.slice(2, 7) + '-' + d.slice(7);
+        };
+
+        telefone.addEventListener('input', () => {
+          /* apagar no meio do número não pode reescrever o cursor para o fim */
+          const fimDoTexto = telefone.selectionStart === telefone.value.length;
+          telefone.value = formatar(telefone.value);
+          if (fimDoTexto) telefone.setSelectionRange(telefone.value.length, telefone.value.length);
+        });
+      }
 
       const mostrar = (texto, tipo) => {
         status.textContent = texto;
@@ -554,9 +599,25 @@ const economyChain = [
           const corpo = await resposta.json().catch(() => ({}));
 
           if (resposta.ok && corpo.ok) {
+            const primeiroNome = String(dados.nome || '').trim().split(/\s+/)[0];
             form.reset();
-            mostrar('Apoio recebido. A campanha entra em contato em breve. Obrigado!', 'sucesso');
-            botao.textContent = 'Apoio enviado';
+            botao.disabled = false;
+            botao.textContent = rotuloOriginal;
+            status.hidden = true;
+
+            if (obrigado) {
+              if (primeiroNome && tituloObrigado) {
+                tituloObrigado.textContent = 'Obrigado, ' + primeiroNome + '!';
+              }
+              form.hidden = true;
+              obrigado.hidden = false;
+              /* leva o foco para a tela nova: quem usa leitor de tela ou
+                 teclado continuaria preso no formulário escondido */
+              tituloObrigado?.focus();
+              obrigado.scrollIntoView({ block: 'center', behavior: 'smooth' });
+            } else {
+              mostrar('Apoio recebido. A campanha entra em contato em breve. Obrigado!', 'sucesso');
+            }
             return;
           }
           mostrar(corpo.erro || 'Não conseguimos registrar agora. Tente novamente em instantes.', 'erro');
@@ -568,6 +629,13 @@ const economyChain = [
         botao.disabled = false;
         botao.textContent = rotuloOriginal;
         if (window.turnstile) window.turnstile.reset();
+      });
+
+      /* "cadastrar outra pessoa": em evento de rua, uma pessoa cadastra várias */
+      document.querySelector('[data-support-again]')?.addEventListener('click', () => {
+        obrigado.hidden = true;
+        form.hidden = false;
+        form.querySelector('[name="nome"]')?.focus();
       });
     }
   </script>
