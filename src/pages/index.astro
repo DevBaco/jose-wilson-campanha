@@ -10,11 +10,13 @@ import { getCollection } from 'astro:content';
 import {
   EMAIL,
   FACEBOOK_HREF,
+  FORM_ENDPOINT,
   INSTAGRAM_HREF,
   PHONE_DISPLAY,
   PRIVACY_PATH,
   SITE_URL,
   TIKTOK_HREF,
+  TURNSTILE_SITE_KEY,
   absoluteUrl,
 } from '../lib/site';
 
@@ -477,6 +479,14 @@ const economyChain = [
               </label>
             </div>
 
+            {/* campo isca: fica escondido para gente e visível para robô */}
+            <div class="honeypot" aria-hidden="true">
+              <label>
+                Apelido
+                <input type="text" name="apelido" tabindex="-1" autocomplete="off" />
+              </label>
+            </div>
+
             <label class="consent-field">
               <input type="checkbox" name="consentimento_lgpd" value="aceito" required />
               <span>
@@ -485,10 +495,16 @@ const economyChain = [
               </span>
             </label>
 
+            {TURNSTILE_SITE_KEY && (
+              <div class="cf-turnstile" data-sitekey={TURNSTILE_SITE_KEY} data-language="pt-br" />
+            )}
+
             <div class="support-form-footer">
               <p><b>*</b> Campos obrigatórios</p>
-              <button class="btn btn-milho" type="submit">Enviar meu apoio</button>
+              <button class="btn btn-milho" type="submit" data-support-submit>Enviar meu apoio</button>
             </div>
+
+            <p class="support-form-status" data-support-status role="status" aria-live="polite" hidden></p>
           </form>
         </div>
       </div>
@@ -497,6 +513,64 @@ const economyChain = [
 
   <SiteFooter />
   <WhatsAppFloat />
+
+  {TURNSTILE_SITE_KEY && (
+    <script is:inline async defer src="https://challenges.cloudflare.com/turnstile/v0/api.js" />
+  )}
+
+  <script define:vars={{ endpoint: FORM_ENDPOINT }}>
+    /* O formulário é estático: sem isto o navegador recarrega a página e o
+       apoio se perde. */
+    const form = document.querySelector('[data-support-form]');
+    if (form) {
+      const botao = form.querySelector('[data-support-submit]');
+      const status = form.querySelector('[data-support-status]');
+      const rotuloOriginal = botao.textContent;
+
+      const mostrar = (texto, tipo) => {
+        status.textContent = texto;
+        status.dataset.tipo = tipo;
+        status.hidden = false;
+      };
+
+      form.addEventListener('submit', async (evento) => {
+        evento.preventDefault();
+        if (botao.disabled) return;
+
+        const dados = Object.fromEntries(new FormData(form).entries());
+        const token = form.querySelector('[name="cf-turnstile-response"]');
+        if (token) dados.turnstile = token.value;
+
+        botao.disabled = true;
+        botao.textContent = 'Enviando…';
+        mostrar('Enviando seu apoio…', 'enviando');
+
+        try {
+          const resposta = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dados),
+          });
+          const corpo = await resposta.json().catch(() => ({}));
+
+          if (resposta.ok && corpo.ok) {
+            form.reset();
+            mostrar('Apoio recebido. A campanha entra em contato em breve. Obrigado!', 'sucesso');
+            botao.textContent = 'Apoio enviado';
+            return;
+          }
+          mostrar(corpo.erro || 'Não conseguimos registrar agora. Tente novamente em instantes.', 'erro');
+        } catch {
+          /* sem internet ou WordPress fora do ar: o WhatsApp continua valendo */
+          mostrar('Falha de conexão. Tente novamente ou fale com a campanha pelo WhatsApp.', 'erro');
+        }
+
+        botao.disabled = false;
+        botao.textContent = rotuloOriginal;
+        if (window.turnstile) window.turnstile.reset();
+      });
+    }
+  </script>
 
   <script>
     const observer = new IntersectionObserver(

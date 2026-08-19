@@ -2039,6 +2039,42 @@
     text-underline-offset: 2px;
   }
 
+  /* o campo isca some da tela sem sumir do DOM: display:none faria robô
+     esperto ignorar */
+  .honeypot {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .support-form-status {
+    margin: var(--spacing-s3) 0 0;
+    padding: var(--spacing-s3);
+    border-radius: var(--radius-r-lg);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .support-form-status[data-tipo='enviando'] {
+    background: var(--color-cinza-claro);
+    color: var(--color-cinza-texto);
+  }
+
+  .support-form-status[data-tipo='sucesso'] {
+    background: #e6f6ec;
+    color: #14663a;
+  }
+
+  .support-form-status[data-tipo='erro'] {
+    background: #fdecec;
+    color: #a11b1b;
+  }
+
   .support-form-footer {
     display: flex;
     flex-wrap: wrap;
