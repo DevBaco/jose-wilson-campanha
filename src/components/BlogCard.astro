@@ -15,6 +15,9 @@ const searchText = [
   post.data.description,
   post.data.section,
   ...post.data.keywords,
+  /* o corpo entra no índice: buscar por palavra que só existe no meio do
+     texto precisa achar o post */
+  post.data.searchText ?? '',
 ]
   .join(' ')
   .normalize('NFD')
@@ -28,6 +31,8 @@ const searchText = [
       <a class="blog-card-media" href={`/blog/${post.id}`}>
         <img
           src={post.data.image}
+          srcset={post.data.imageSrcset}
+          sizes="(min-width: 1024px) 380px, (min-width: 640px) 45vw, 92vw"
           alt={post.data.imageAlt ?? ''}
           width={post.data.imageWidth}
           height={post.data.imageHeight}

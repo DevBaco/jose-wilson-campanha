@@ -201,6 +201,8 @@ const conversionText = isMemoryPost
             <figure class="post-cover">
               <img
                 src={post.data.image}
+                srcset={post.data.imageSrcset}
+                sizes="(min-width: 1024px) 800px, 94vw"
                 alt={post.data.imageAlt ?? ''}
                 width={post.data.imageWidth}
                 height={post.data.imageHeight}

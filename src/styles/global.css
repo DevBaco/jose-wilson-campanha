@@ -2683,6 +2683,84 @@
     border-top: 1px solid var(--color-cinza-claro);
   }
 
+  /* Vídeo do YouTube, mapa, post incorporado: o WordPress entrega um iframe
+     com width/height fixos do provedor. Sem isto ele estoura a largura no
+     celular e a página inteira ganha rolagem horizontal. */
+  .post-content iframe,
+  .post-content video,
+  .post-content embed,
+  .post-content object {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    aspect-ratio: 16 / 9;
+    height: auto;
+    margin: var(--spacing-s5) 0;
+    border: 0;
+    border-radius: var(--radius-r-xl);
+    background: var(--color-azul-profundo);
+  }
+
+  /* o bloco de incorporação do WP envolve o iframe em duas divs */
+  .post-content .wp-block-embed,
+  .post-content .wp-block-embed__wrapper {
+    margin-inline: 0;
+    max-width: 100%;
+  }
+
+  .post-content .wp-block-embed figcaption {
+    margin-top: var(--spacing-s2);
+  }
+
+  /* incorporações que não são vídeo (Instagram, X) vêm em proporção alta */
+  .post-content .wp-block-embed-instagram iframe,
+  .post-content .wp-block-embed-twitter iframe,
+  .post-content .wp-block-embed-facebook iframe {
+    aspect-ratio: auto;
+    min-height: 480px;
+  }
+
+  /* tabela larga rola dentro da própria caixa, sem arrastar a página */
+  .post-content table {
+    display: block;
+    width: 100%;
+    margin: var(--spacing-s5) 0;
+    overflow-x: auto;
+    border-collapse: collapse;
+    font-size: 15px;
+  }
+
+  .post-content th,
+  .post-content td {
+    padding: 10px 14px;
+    border: 1px solid var(--color-cinza-claro);
+    text-align: left;
+  }
+
+  .post-content th {
+    background: var(--color-azul-claro);
+    color: var(--color-azul-profundo);
+    font-weight: 700;
+  }
+
+  .post-content .wp-block-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--spacing-s3);
+    margin: var(--spacing-s5) 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .post-content .wp-block-gallery figure {
+    margin: 0;
+  }
+
+  /* qualquer coisa que o editor jogue com largura fixa fica contida */
+  .post-content > * {
+    max-width: 100%;
+  }
+
   /* o WP alinha imagens com estas classes */
   .post-content .aligncenter {
     margin-inline: auto;

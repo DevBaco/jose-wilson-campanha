@@ -19,6 +19,8 @@ const noticias = defineCollection({
     section: z.string().default('Notícias'),
     keywords: z.array(z.string()).default([]),
     image: z.string().optional(),
+    /* srcset montado a partir dos tamanhos que o WordPress já gera */
+    imageSrcset: z.string().optional(),
     imageAlt: z.string().optional(),
     imageWidth: z.number().int().positive().optional(),
     imageHeight: z.number().int().positive().optional(),
@@ -34,6 +36,8 @@ const noticias = defineCollection({
         height: z.number().int().positive(),
       })
       .optional(),
+    /* texto do corpo, usado só pelo índice de busca da listagem */
+    searchText: z.string().optional(),
     draft: z.boolean().default(false),
   }),
 });
