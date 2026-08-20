@@ -154,6 +154,7 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    overflow-x: clip;
     -webkit-text-size-adjust: 100%;
   }
 
@@ -669,7 +670,9 @@
     display: inline-grid;
     place-items: center;
     width: 44px;
+    min-width: 44px;
     height: 44px;
+    flex: none;
     border: 2px solid var(--color-azul);
     border-radius: var(--radius-r-full);
     background: transparent;
@@ -727,6 +730,13 @@
     }
     .brand-sep {
       height: 28px;
+    }
+  }
+
+  @media (max-width: 359px) {
+    .brand-sep,
+    .brand-democrata {
+      display: none;
     }
   }
 }
@@ -829,11 +839,15 @@
   .hero-rail {
     position: relative;
     z-index: 4;
+    height: 50px;
     overflow: hidden;
+    contain: inline-size paint;
     background: var(--color-amarelo);
   }
 
   .hero-rail-track {
+    position: absolute;
+    inset: 0 auto auto 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -922,10 +936,71 @@
   }
 
   @media (max-width: 767px) {
+    .hero-banner-caption .hero-subtitle strong {
+      max-width: 100%;
+      font-size: clamp(16px, 4.5vw, 19px);
+      letter-spacing: -0.025em;
+      white-space: nowrap;
+    }
+
     .hero-rail-track {
-      gap: var(--spacing-s3);
-      padding: var(--spacing-s2) var(--spacing-s3);
+      position: relative;
+      display: block;
+      width: 100%;
+      min-width: 0;
+      height: 34px;
+      padding: 0;
       font-size: 11px;
+    }
+
+    .hero-rail {
+      height: 34px;
+    }
+
+    .hero-rail-track i,
+    .hero-rail-track span:nth-of-type(n + 4) {
+      display: none;
+    }
+
+    .hero-rail-track span {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-inline: var(--spacing-s3);
+      opacity: 0;
+      white-space: nowrap;
+      animation: hero-rail-message 9s infinite;
+    }
+
+    .hero-rail-track span:nth-of-type(2) {
+      animation-delay: 3s;
+    }
+
+    .hero-rail-track span:nth-of-type(3) {
+      animation-delay: 6s;
+    }
+  }
+
+  @keyframes hero-rail-message {
+    0%,
+    29% {
+      opacity: 1;
+    }
+    33%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 767px) and (prefers-reduced-motion: reduce) {
+    .hero-rail-track span {
+      animation: none;
+    }
+
+    .hero-rail-track span:first-of-type {
+      opacity: 1;
     }
   }
 }
@@ -1016,27 +1091,42 @@
     color: var(--color-cinza-texto);
   }
 
-  /* no celular três colunas não cabem: cada número vira uma linha */
+  /* No celular os números viram três cartões compactos e equivalentes. */
   @media (max-width: 559px) {
     .story-stats {
-      grid-template-columns: minmax(0, 1fr);
-      gap: var(--spacing-s3);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--spacing-s2);
+      padding-top: var(--spacing-s3);
     }
 
     .story-stats > div {
-      display: grid;
-      grid-template-columns: 112px minmax(0, 1fr);
-      gap: var(--spacing-s3);
-      align-items: baseline;
+      display: flex;
+      min-width: 0;
+      min-height: 94px;
+      flex-direction: column;
+      justify-content: center;
+      padding: 12px 8px;
+      border: 1px solid var(--color-cinza-claro);
+      border-radius: var(--radius-r-lg);
+      background: var(--color-off-white);
+      text-align: center;
     }
 
     .story-stats dt {
-      font-size: 24px;
+      font-size: clamp(20px, 6vw, 24px);
       white-space: nowrap;
     }
 
     .story-stats dd {
-      margin: 0;
+      margin: 7px 0 0;
+      font-size: 11px;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .story-section .section-actions,
+    .story-section .section-actions .btn {
+      width: 100%;
     }
   }
 
@@ -1862,11 +1952,15 @@
 
   .support-aside {
     display: grid;
+    min-width: 0;
+    max-width: 100%;
     gap: var(--spacing-s4);
   }
 
   /* peça de campanha ao lado do formulário */
   .support-card {
+    min-width: 0;
+    max-width: 100%;
     margin: 0;
     overflow: hidden;
     border-radius: var(--radius-r-2xl);
@@ -1884,6 +1978,8 @@
 
   .support-contacts {
     display: grid;
+    min-width: 0;
+    max-width: 100%;
     margin-top: 0;
   }
 
@@ -1894,6 +1990,7 @@
     font-size: var(--font-subheading-size);
     font-weight: var(--font-subheading-weight);
     color: var(--color-branco);
+    overflow-wrap: anywhere;
     transition: color 160ms ease;
   }
 
@@ -1902,6 +1999,8 @@
   }
 
   .support-social {
+    min-width: 0;
+    max-width: 100%;
     margin-top: 0;
   }
 
@@ -2033,7 +2132,8 @@
 
   .consent-field a {
     display: inline-block;
-    padding-block: 6px;
+    padding-block: 12px;
+    margin-block: -6px;
     color: var(--color-azul);
     text-decoration: underline;
     text-underline-offset: 2px;
@@ -2050,6 +2150,18 @@
     overflow: hidden;
     clip-path: inset(50%);
     white-space: nowrap;
+  }
+
+  .honeypot label,
+  .honeypot input {
+    position: absolute;
+    inset: 0;
+    width: 1px;
+    min-width: 0;
+    max-width: 1px;
+    height: 1px;
+    margin: 0;
+    padding: 0;
   }
 
   /* Tela de obrigado: ocupa o lugar do formulário, com o mesmo cartão branco
@@ -2245,7 +2357,10 @@
      toque sem quebrar a linha. */
   .image-credit a {
     display: inline-block;
-    padding-block: 6px;
+    padding-block: 10px;
+    padding-inline: 9px;
+    margin-block: -4px;
+    margin-inline: -4px;
     color: var(--color-azul);
     text-decoration: underline;
     text-decoration-color: var(--color-cinza);
@@ -2787,10 +2902,14 @@
 
   .post-content a {
     display: inline-block;
-    padding-block: 4px;
+    max-width: 100%;
+    padding-block: 8px;
+    margin-block: -4px;
     color: var(--color-azul);
     text-decoration: underline;
     text-underline-offset: 3px;
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
 
   .post-content blockquote {
@@ -3073,7 +3192,9 @@
     margin-bottom: var(--spacing-s2);
   }
 
-  .footer-links a {
+  /* :not(.social-link) porque os ícones de rede já são círculos de 44px com
+     o glifo centralizado por grid — aplicar flex aqui os desalinha */
+  .footer-links a:not(.social-link) {
     display: inline-flex;
     align-items: center;
     /* no celular esses links ficam empilhados e colados: sem altura mínima
@@ -3087,11 +3208,11 @@
     transition: color 160ms ease;
   }
 
-  .footer-links a {
+  .footer-links a:not(.social-link) {
     color: var(--color-azul-profundo);
   }
 
-  .footer-links a:hover {
+  .footer-links a:not(.social-link):hover {
     color: var(--color-azul);
   }
 
@@ -3115,6 +3236,73 @@
     }
     .footer-links {
       justify-items: end;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .site-footer {
+      padding-block: var(--spacing-s5);
+    }
+
+    .footer-grid {
+      gap: var(--spacing-s4);
+    }
+
+    .footer-brand {
+      flex-wrap: nowrap;
+      gap: var(--spacing-s3);
+    }
+
+    .footer-logos {
+      flex: none;
+    }
+
+    .footer-logos img {
+      height: 56px;
+    }
+
+    .footer-grid strong {
+      font-size: 18px;
+    }
+
+    .footer-links {
+      width: 100%;
+      justify-items: stretch;
+      text-align: left;
+    }
+
+    .footer-links .social-links {
+      display: flex;
+      width: 100%;
+      max-width: none;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: var(--spacing-s3);
+    }
+
+    .footer-links .social-link {
+      display: inline-grid;
+      place-items: center;
+      justify-content: center;
+      flex: 0 0 44px;
+      padding: 0;
+    }
+
+    .footer-links > a {
+      width: 100%;
+      justify-content: flex-start;
+      border-top: 1px solid var(--color-cinza-claro);
+    }
+
+    .footer-links > span {
+      display: block;
+      width: 100%;
+      padding-top: var(--spacing-s2);
+    }
+
+    .footer-legal {
+      margin-top: var(--spacing-s4);
+      padding-top: var(--spacing-s3);
     }
   }
 }

@@ -93,13 +93,14 @@ function conectar(url) {
 const MEDIR = `(() => {
   const doc = document.documentElement;
   const vw = doc.clientWidth;
-  const problemas = { estouro: [], toque: [], texto: [], imagens: [] };
+  const problemas = { estouro: [], todosEstourando: [], toque: [], texto: [], imagens: [] };
 
   const seletor = (el) => {
     const classes = typeof el.className === 'string' && el.className
       ? '.' + el.className.trim().split(/\\s+/).slice(0, 2).join('.')
       : '';
-    return el.tagName.toLowerCase() + classes;
+    const texto = el.textContent?.trim().replace(/\\s+/g, ' ').slice(0, 28);
+    return el.tagName.toLowerCase() + classes + (texto ? ' ["' + texto + '"]' : '');
   };
 
   for (const el of document.querySelectorAll('body *')) {
@@ -109,6 +110,7 @@ const MEDIR = `(() => {
     if (r.width === 0 && r.height === 0) continue;
 
     if (r.right > vw + 1 || r.left < -1) {
+      problemas.todosEstourando.push(seletor(el) + ' → left ' + Math.round(r.left) + ', right ' + Math.round(r.right));
       /* elemento dentro de um contêiner que corta (marquee, carrossel, tabela
          com rolagem própria) não estoura a página: é recorte intencional */
       let cortado = false;
@@ -147,6 +149,7 @@ const MEDIR = `(() => {
   return JSON.stringify({
     vw,
     altura: doc.scrollHeight,
+    larguraDocumento: doc.scrollWidth,
     rolagemHorizontal: doc.scrollWidth > vw,
     ...problemas,
   });
@@ -179,6 +182,7 @@ for (const caminho of CAMINHOS) {
   const secoes = [
     ['ROLAGEM HORIZONTAL', r.rolagemHorizontal ? ['a página inteira rola de lado'] : []],
     ['ESTOURANDO A TELA', r.estouro],
+    ['TODOS FORA DA TELA (DIAGNÓSTICO)', r.rolagemHorizontal ? r.todosEstourando : []],
     ['ALVO DE TOQUE PEQUENO (< 40px)', r.toque],
     ['TEXTO MIÚDO (< 11px)', r.texto],
     ['IMAGEM SEM width/height', r.imagens],
